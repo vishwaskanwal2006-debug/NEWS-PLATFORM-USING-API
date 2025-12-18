@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stock & Crypto Updates</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>📈 Latest Stock & Crypto Updates</h1>
+      <div class="actions">
+        <button id="darkToggle">🌙</button>
+        <button id="gainersBtn">📈 Gainers</button>
+        <button id="losersBtn">📉 Losers</button>
+        <button id="allBtn">📋 All</button>
+        <button id="refreshBtn">🔄 Refresh</button>
+      </div>
+    </header>
+
+    <input id="search" type="text" placeholder="Search stocks or crypto..." />
+
+    <section>
+      <h2>📊 Stocks</h2>
+      <div class="grid" id="stocksContainer"></div>
+    </section>
+
+    <section>
+      <h2>💰 Cryptocurrencies</h2>
+      <div class="grid" id="cryptoContainer"></div>
+    </section>
+
+    <footer>
+      Powered by <a href="https://finnhub.io">Finnhub</a>. Built with ❤️
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

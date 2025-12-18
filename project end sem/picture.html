@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nature & Animal Gallery</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap">
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      --text-color: #fff;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --header-bg: rgba(0, 0, 0, 0.7);
+      --footer-bg: rgba(0, 0, 0, 0.6);
+    }
+
+    body.light-mode {
+      --bg-gradient: linear-gradient(to right, #f0f0f0, #ffffff, #e0e0e0);
+      --text-color: #111;
+      --card-bg: rgba(0, 0, 0, 0.05);
+      --header-bg: rgba(255, 255, 255, 0.7);
+      --footer-bg: rgba(255, 255, 255, 0.6);
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-color);
+      transition: background 0.5s, color 0.5s;
+    }
+
+    header {
+      padding: 1rem;
+      background: var(--header-bg);
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+
+    #toggle-theme {
+      position: absolute;
+      right: 1rem;
+      top: 1rem;
+      background: transparent;
+      border: 2px solid var(--text-color);
+      color: var(--text-color);
+      padding: 0.3rem 0.6rem;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    #toggle-theme:hover {
+      background: var(--text-color);
+      color: var(--bg-gradient);
+    }
+
+    #search-container {
+      margin: 1rem auto;
+      text-align: center;
+    }
+
+    #search-container input {
+      padding: 0.6rem 1rem;
+      width: 250px;
+      border-radius: 20px;
+      border: none;
+      font-size: 1rem;
+    }
+
+    #search-container button {
+      padding: 0.6rem 1.2rem;
+      margin-left: 10px;
+      font-size: 1rem;
+      border-radius: 20px;
+      border: none;
+      background-color: #00b894;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    #search-container button:hover {
+      background-color: #019875;
+    }
+
+    .articles {
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 15px;
+      margin: 1rem auto;
+      width: 90%;
+      max-width: 500px;
+      padding: 1rem;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .card img {
+      width: 100%;
+      border-radius: 10px;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .card.zoomed img {
+      transform: scale(1.2);
+    }
+
+    .label-overlay {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .gallery .card {
+      width: 250px;
+      margin: 10px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.9rem;
+      background: var(--footer-bg);
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🌿 Nature & Animal Gallery</h1>
+    <button id="toggle-theme">🌙</button>
+  </header>
+
+  <div id="search-container">
+    <input type="text" id="search-query" placeholder="Search for an animal/nature..." />
+    <button onclick="searchImages()">🔍 Search</button>
+  </div>
+
+  <section class="articles" id="articles">
+    <div id="daily-picture" class="card" onclick="zoomPicture(this)">
+      <div class="label-overlay">Picture of the Day</div>
+      <p>Fetching Picture of the Day...</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>Powered by Pexels | Nature & Animal Gallery</p>
+  </footer>
+
+  <script>
+    const API_KEY = "cE6sOe58z5nxcG7JZX0g9w4pTkex5snh4gapCej3UYJ4I0xemubOkl1M";
+    const dailyPicture = document.getElementById("daily-picture");
+    const toggleBtn = document.getElementById("toggle-theme");
+    const searchQuery = document.getElementById("search-query");
+
+    function setTheme(mode) {
+      document.body.classList.toggle("light-mode", mode === "light");
+      toggleBtn.textContent = mode === "light" ? "🌙" : "☀️";
+      localStorage.setItem("theme", mode);
+    }
+
+    toggleBtn.addEventListener("click", () => {
+      const current = document.body.classList.contains("light-mode") ? "light" : "dark";
+      setTheme(current === "light" ? "dark" : "light");
+    });
+
+    function applySavedTheme() {
+      const saved = localStorage.getItem("theme") || "dark";
+      setTheme(saved);
+    }
+
+    function zoomPicture(card) {
+      card.classList.toggle("zoomed");
+    }
+
+    async function fetchRandomImage(category) {
+      const url = `https://api.pexels.com/v1/search?query=${category}&per_page=1&page=${Math.floor(Math.random() * 100) + 1}`;
+      try {
+        const res = await fetch(url, {
+          headers: {
+            Authorization: API_KEY
+          }
+        });
+        const data = await res.json();
+        return data.photos[0];
+      } catch (error) {
+        console.error("API error: Unable to fetch image.", error);
+        dailyPicture.innerHTML = `<p style="text-align: center; color: red;">Failed to fetch image. Please try again later.</p>`;
+        return null;
+      }
+    }
+
+    async function showDailyImage() {
+      const stored = localStorage.getItem("pictureOfTheDay");
+      const storedDate = localStorage.getItem("pictureOfTheDayDate");
+      const today = new Date().toISOString().split('T')[0];
+
+      if (stored && storedDate === today) {
+        const imageData = JSON.parse(stored);
+        dailyPicture.innerHTML = `<div class="label-overlay">Picture of the Day</div><img src="${imageData.src.large}" alt="${imageData.alt}" />`;
+      } else {
+        const categories = ["animal", "nature"];
+        const category = categories[Math.floor(Math.random() * categories.length)];
+        const imageData = await fetchRandomImage(category);
+        if (imageData) {
+          localStorage.setItem("pictureOfTheDay", JSON.stringify(imageData));
+          localStorage.setItem("pictureOfTheDayDate", today);
+          dailyPicture.innerHTML = `<div class="label-overlay">Picture of the Day</div><img src="${imageData.src.large}" alt="${imageData.alt}" />`;
+        }
+      }
+    }
+
+    async function searchImages() {
+      const query = searchQuery.value.trim();
+      if (!query) return;
+
+      const url = `https://api.pexels.com/v1/search?query=${query}&per_page=12`;
+      try {
+        const res = await fetch(url, {
+          headers: {
+            Authorization: API_KEY
+          }
+        });
+        const data = await res.json();
+        if (data.photos.length > 0) {
+          displayGallery(data.photos);
+        } else {
+          alert("No results found!");
+        }
+      } catch (error) {
+        console.error("API error: Unable to fetch search results.", error);
+      }
+    }
+
+    function displayGallery(photos) {
+      const gallery = document.getElementById("articles");
+      gallery.innerHTML = "<h2>Search Results:</h2><div class='gallery'></div>";
+      const container = gallery.querySelector(".gallery");
+      photos.forEach(photo => {
+        const card = document.createElement("div");
+        card.classList.add("card");
+        card.innerHTML = `<img src="${photo.src.medium}" alt="${photo.alt}" />`;
+        container.appendChild(card);
+      });
+    }
+
+    applySavedTheme();
+    showDailyImage();
+  </script>
+</body>
+</html>

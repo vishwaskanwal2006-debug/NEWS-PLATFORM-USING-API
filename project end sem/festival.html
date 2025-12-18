@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-behavior: smooth;">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Global Festivals</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Lato:wght@400;700&display=swap">
+  <style>
+    :root {
+      --bg-color: #FFF8E7;
+      --text-color: #333;
+      --accent1: #E2725B;
+      --accent2: #6B7280;
+      --accent3: #F4A261;
+      --card-bg: #FFFFFF;
+      --nav-bg: rgba(255, 248, 231, 0.9);
+      --footer-bg: #F9E4B7;
+    }
+
+    body.dark-mode {
+      --bg-color: #2D2D2D;
+      --text-color: #FFF;
+      --card-bg: #3C3C3C;
+      --nav-bg: rgba(45, 45, 45, 0.9);
+      --footer-bg: #4A4A4A;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Lato', sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      transition: background 0.5s, color 0.5s;
+      background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAG0lEQVQYV2NkYGD4z8DAwMgABXAGNgGwSgwVAFbgIQR9dgAAAABJRU5ErkJggg==');
+    }
+
+    header {
+      padding: 1rem;
+      text-align: center;
+      position: relative;
+    }
+
+    header h1 {
+      font-family: 'Merriweather', serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 0;
+      color: var(--accent1);
+    }
+
+    #toggle-theme {
+      position: absolute;
+      right: 1rem;
+      top: 1rem;
+      background: var(--accent2);
+      border: none;
+      color: #FFF;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      cursor: pointer;
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      transition: background 0.3s;
+    }
+
+    #toggle-theme:hover {
+      background: var(--accent3);
+    }
+
+    nav {
+      background: var(--nav-bg);
+      padding: 0.5rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    nav a {
+      color: var(--text-color);
+      text-decoration: none;
+      margin: 0 1.5rem;
+      font-family: 'Merriweather', serif;
+      font-size: 1.1rem;
+      font-weight: 400;
+      transition: color 0.3s;
+    }
+
+    nav a:hover {
+      color: var(--accent1);
+      text-decoration: underline;
+    }
+
+    .hero {
+      position: relative;
+      height: 60vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background-size: cover;
+      background-position: center;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      color: #FFF;
+    }
+
+    .hero h2 {
+      font-family: 'Merriweather', serif;
+      font-size: 3rem;
+      font-weight: 700;
+      margin: 0;
+      animation: fadeIn 1s ease;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      font-weight: 400;
+      margin: 0.5rem 0;
+    }
+
+    .cta-button {
+      display: inline-block;
+      padding: 0.8rem 1.5rem;
+      background: var(--accent1);
+      color: #FFF;
+      text-decoration: none;
+      border-radius: 25px;
+      font-family: 'Lato', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-top: 1rem;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .cta-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 10px var(--accent3);
+    }
+
+    .articles {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      width: 100%;
+      text-align: center;
+      font-family: 'Merriweather', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 1.5rem 0;
+      color: var(--accent2);
+      animation: fadeIn 0.8s ease;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 10px;
+      margin: 1rem;
+      width: 320px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+      animation: slideUp 0.6s ease-in-out forwards;
+      animation-delay: calc(var(--order) * 0.2s);
+    }
+
+    .card:hover {
+      transform: scale(1.03);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .card img {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .card h3 {
+      font-family: 'Merriweather', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+      color: var(--accent1);
+    }
+
+    .card p {
+      font-size: 0.95rem;
+      font-weight: 400;
+      line-height: 1.6;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 0.9rem;
+      font-weight: 400;
+      background: var(--footer-bg);
+      margin-top: 2rem;
+    }
+
+    .news-link {
+      color: var(--accent3);
+      text-decoration: underline;
+    }
+
+    .news-link:hover {
+      color: var(--accent1);
+    }
+
+    /* Confetti Animation */
+    .confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      width: 8px;
+      height: 16px;
+      opacity: 0.7;
+      animation: fall 6s linear infinite;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 0.7;
+      }
+      100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(50px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 800px) {
+      .card {
+        width: 90%;
+      }
+      .hero h2 {
+        font-size: 2rem;
+      }
+      .hero p {
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      nav a {
+        display: block;
+        margin: 0.5rem 0;
+      }
+      header h1 {
+        font-size: 2rem;
+      }
+      .section-title {
+        font-size: 1.6rem;
+      }
+      #toggle-theme {
+        top: 0.5rem;
+        right: 0.5rem;
+        padding: 0.3rem 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="confetti" id="confetti"></div>
+
+  <header>
+    <h1>Global Festivals</h1>
+    <button id="toggle-theme" aria-label="Toggle theme" title="Toggle light/dark mode">🌙</button>
+  </header>
+
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#festivals">Festivals</a>
+    <a href="#about">About</a>
+  </nav>
+
+  <section class="hero" id="home" style="background-image: url('https://images.unsplash.com/photo-1506152983158-b4a74a01c721?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');">
+    <div class="hero-content">
+      <h2>Discover Global Festivals</h2>
+      <p>Uncover the stories and traditions of the world’s vibrant celebrations</p>
+      <a href="#festivals" class="cta-button">Explore Now</a>
+    </div>
+  </section>
+
+  <section class="articles" id="festivals">
+    <h2 class="section-title">Popular Festivals</h2>
+    <div class="articles" data-section="festivals"></div>
+  </section>
+
+  <section class="articles" id="about">
+    <h2 class="section-title">Why Festivals Matter</h2>
+    <div class="articles" data-section="about"></div>
+  </section>
+
+  <footer>
+    <p>Powered by Pexels API | Data sourced from Wikipedia, IndianTravelStore, Intrepid Travel © 2025</p>
+  </footer>
+
+  <script>
+    const pexelsApiKey = 'cE6sOe58z5nxcG7JZX0g9w4pTkex5snh4gapCej3UYJ4I0xemubOkl1M';
+    const toggleBtn = document.getElementById('toggle-theme');
+    const imageCache = new Map();
+
+    function setTheme(mode) {
+      const isDark = mode === 'dark';
+      document.body.classList.toggle('dark-mode', isDark);
+      toggleBtn.textContent = isDark ? '☀️' : '🌙';
+      localStorage.setItem('theme', mode);
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      const isCurrentlyDark = document.body.classList.contains('dark-mode');
+      setTheme(isCurrentlyDark ? 'light' : 'dark');
+    });
+
+    function applySavedTheme() {
+      const saved = localStorage.getItem('theme') || 'light';
+      setTheme(saved);
+    }
+
+    async function fetchPexelsImage(query, fallbackUrl) {
+      if (imageCache.has(query)) {
+        return imageCache.get(query);
+      }
+
+      try {
+        const response = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=1`, {
+          headers: { Authorization: pexelsApiKey },
+          signal: AbortSignal.timeout(5000)
+        });
+        if (!response.ok) {
+          if (response.status === 429) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            return fetchPexelsImage(query, fallbackUrl);
+          }
+          throw new Error('Pexels API error');
+        }
+        const data = await response.json();
+        const url = data.photos.length > 0 ? data.photos[0].src.large : fallbackUrl;
+        imageCache.set(query, url);
+        return url;
+      } catch (err) {
+        console.error('Pexels error:', err.message);
+        imageCache.set(query, fallbackUrl);
+        return fallbackUrl;
+      }
+    }
+
+    function createConfetti() {
+      const confettiContainer = document.getElementById('confetti');
+      const colors = ['#E2725B', '#F4A261', '#6B7280'];
+      for (let i = 0; i < 30; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.left = `${Math.random() * 100}vw`;
+        piece.style.animationDelay = `${Math.random() * 6}s`;
+        piece.style.width = `${Math.random() * 8 + 4}px`;
+        piece.style.height = `${Math.random() * 16 + 8}px`;
+        confettiContainer.appendChild(piece);
+      }
+    }
+
+    const festivalData = {
+      festivals: [
+        {
+          title: 'Diwali',
+          description: '<b>Story</b>: Diwali, the Festival of Lights, celebrates Lord Rama’s return to Ayodhya after defeating Ravana, symbolizing good over evil. <br><b>Where</b>: India, global Hindu, Sikh, Jain communities. <br><b>Importance</b>: Promotes unity and prosperity. <br><b>Traditions</b>: Lighting diyas, rangoli, fireworks, sharing sweets. <br><b>Economic Impact</b>: Boosts retail with gift and decoration sales.',
+          query: 'Diwali lights',
+          fallback: 'https://images.unsplash.com/photo-1544094759-7c6242b88c63?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://en.wikipedia.org/wiki/Diwali'
+        },
+        {
+          title: 'Holi',
+          description: '<b>Story</b>: Holi celebrates Prahlad’s victory over Holika, marking spring and good over evil. <br><b>Where</b>: India, Nepal, Indian diaspora. <br><b>Importance</b>: Encourages joy and forgiveness. <br><b>Traditions</b>: Colored powders, water fights, gujiya, thandai. <br><b>Economic Impact</b>: Drives tourism and color sales.',
+          query: 'Holi colors',
+          fallback: 'https://images.unsplash.com/photo-1586218241800-e1d9aa04e44b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://en.wikipedia.org/wiki/Holi'
+        },
+        {
+          title: 'Carnival',
+          description: '<b>Story</b>: Evolved from European traditions, transformed by freed African slaves to celebrate emancipation. <br><b>Where</b>: Brazil (Rio), Trinidad, Toronto. <br><b>Importance</b>: Honors freedom and creativity. <br><b>Traditions</b>: Samba parades, costumes, calypso music. <br><b>Economic Impact</b>: Attracts millions of tourists.',
+          query: 'Carnival parade',
+          fallback: 'https://images.unsplash.com/photo-1519751138087-5bf79df62d5b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://en.wikipedia.org/wiki/Carnival'
+        },
+        {
+          title: 'Oktoberfest',
+          description: '<b>Story</b>: Began in 1810 as a royal wedding celebration in Munich. <br><b>Where</b>: Munich, Germany, global events. <br><b>Importance</b>: Showcases Bavarian culture. <br><b>Traditions</b>: Beer tents, music, pretzels, lederhosen. <br><b>Economic Impact</b>: Generates millions for Munich’s economy.',
+          query: 'Oktoberfest beer',
+          fallback: 'https://images.unsplash.com/photo-1506295494668-4ca3b20728ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://en.wikipedia.org/wiki/Oktoberfest'
+        },
+        {
+          title: 'Christmas',
+          description: '<b>Story</b>: Celebrates the birth of Jesus Christ. <br><b>Where</b>: Worldwide, especially Christian-majority countries. <br><b>Importance</b>: Promotes love and charity. <br><b>Traditions</b>: Trees, gifts, midnight Mass, plum cakes. <br><b>Economic Impact</b>: Drives global retail sales.',
+          query: 'Christmas tree',
+          fallback: 'https://images.unsplash.com/photo-1543584478-7f7a31e5e7d6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://en.wikipedia.org/wiki/Christmas'
+        },
+        {
+          title: 'Eid al-Fitr',
+          description: '<b>Story</b>: Marks the end of Ramadan, celebrating spiritual renewal. <br><b>Where</b>: Muslim-majority countries, global. <br><b>Importance</b>: Encourages charity and unity. <br><b>Traditions</b>: Prayers, sweets like seviyan, Zakat. <br><b>Economic Impact</b>: Boosts food and clothing markets.',
+          query: 'Eid prayer',
+          fallback: 'https://images.unsplash.com/photo-1560435650-7ec2e17ba926?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://en.wikipedia.org/wiki/Eid_al-Fitr'
+        }
+      ],
+      about: [
+        {
+          title: 'Cultural Significance',
+          description: 'Festivals unite communities, preserve cultural heritage, and foster joy. They strengthen social bonds, promote identity, and drive economic growth through tourism and local business. From spiritual renewal to creative expression, festivals connect people to their roots and shared humanity.',
+          query: 'cultural festival',
+          fallback: 'https://images.unsplash.com/photo-1506152983158-b4a74a01c721?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://en.wikipedia.org/wiki/Festival'
+        }
+      ]
+    };
+
+    async function renderArticle(data, section, index) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.dataset.section = section;
+      card.style.setProperty('--order', index);
+
+      const imgSrc = await fetchPexelsImage(data.query, data.fallback);
+      const description = data.description.length > 200 ? data.description.substring(0, 200) + '...' : data.description;
+
+      card.innerHTML = `
+        <a href="${data.link}" target="_blank" class="news-link"><img src="${imgSrc}" alt="${data.title}"></a>
+        <h3>${data.title}</h3>
+        <p>${description}</p>
+        <p><a href="${data.link}" target="_blank" class="news-link">Read More</a></p>
+      `;
+      return card;
+    }
+
+    async function loadArticles() {
+      const sections = ['festivals', 'about'];
+      for (const section of sections) {
+        const sectionContainer = document.querySelector(`#${section} .articles`);
+        sectionContainer.innerHTML = '';
+        let index = 0;
+        for (const data of festivalData[section]) {
+          const card = await renderArticle(data, section, index++);
+          sectionContainer.appendChild(card);
+        }
+      }
+    }
+
+    createConfetti();
+    applySavedTheme();
+    loadArticles();
+  </script>
+</body>
+</html>

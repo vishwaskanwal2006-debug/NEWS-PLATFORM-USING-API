@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Insights</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #1e3a8a, #4c1d95);
+      color: #e2e8f0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      transition: all 0.3s ease;
+      overflow-y: auto;
+      margin: 0;
+    }
+    body.light-mode {
+      background: linear-gradient(135deg, #e0f2fe, #f9e8ff);
+      color: #2d3748;
+    }
+    .header {
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), transparent);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      padding: 1.5rem 0;
+    }
+    .light-mode .header {
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), transparent);
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 1rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: fadeInUp 0.5s ease forwards;
+      opacity: 0;
+    }
+    .card:nth-child(1) { animation-delay: 0.1s; }
+    .card:nth-child(2) { animation-delay: 0.2s; }
+    .card:nth-child(3) { animation-delay: 0.3s; }
+    .card:nth-child(4) { animation-delay: 0.4s; }
+    .light-mode .card {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .card:hover {
+      transform: translateY(-5px) rotate(1deg);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+    .toggle-btn {
+      background: #4a5568;
+      color: #fff;
+      transition: background 0.3s ease, transform 0.2s;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .light-mode .toggle-btn {
+      background: #3182ce;
+    }
+    .toggle-btn:hover {
+      background: #718096;
+      transform: scale(1.1);
+    }
+    .light-mode .toggle-btn:hover {
+      background: #2b6cb0;
+    }
+    .section-title {
+      text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+      animation: slideInLeft 0.5s ease;
+    }
+    .light-mode .section-title {
+      text-shadow: none;
+    }
+    img {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      border-radius: 0.5rem;
+    }
+    img:hover {
+      opacity: 0.9;
+      transform: scale(1.05);
+    }
+    .parallax-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('https://images.pexels.com/photos/531756/pexels-photo-531756.jpeg') no-repeat center center;
+      background-size: cover;
+      z-index: -1;
+      transform: translateZ(-1px) scale(1.1);
+      opacity: 0.3;
+    }
+    .news-link {
+      color: #60a5fa;
+      text-decoration: underline;
+      transition: color 0.3s ease;
+    }
+    .news-link:hover {
+      color: #2563eb;
+    }
+    .light-mode .news-link {
+      color: #1e40af;
+    }
+    .light-mode .news-link:hover {
+      color: #1e3a8a;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="parallax-bg"></div>
+  <header class="header text-center">
+    <button class="toggle-btn fixed top-4 left-4" onclick="toggleMode()">
+      <i class="fas fa-moon"></i>
+    </button>
+    <h1 class="text-4xl font-bold text-white light-mode:text-gray-800">Weather Insights</h1>
+    <p class="text-lg mt-2 text-gray-300 light-mode:text-gray-600">Explore Weather Patterns, Forecasting, and Recent News</p>
+  </header>
+
+  <nav class="flex justify-center gap-6 py-4 bg-gray-800 light-mode:bg-gray-100">
+    <a href="#patterns" class="text-blue-400 hover:text-blue-300 light-mode:text-blue-600 light-mode:hover:text-blue-800">Weather Patterns</a>
+    <a href="#forecasting" class="text-blue-400 hover:text-blue-300 light-mode:text-blue-600 light-mode:hover:text-blue-800">Forecasting</a>
+    <a href="#news" class="text-blue-400 hover:text-blue-300 light-mode:text-blue-600 light-mode:hover:text-blue-800">Recent News</a>
+  </nav>
+
+  <main class="container mx-auto px-4 py-8 relative z-10">
+    <section id="patterns" class="mb-12">
+      <h2 class="section-title text-3xl font-semibold mb-6 text-center">Weather Patterns</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="card p-6">
+          <h3 class="text-xl font-bold mb-2">Seasonal Cycles</h3>
+          <p>Weather follows seasonal patterns driven by Earth's tilt, affecting temperature and precipitation.</p>
+        </div>
+        <div class="card p-6">
+          <h3 class="text-xl font-bold mb-2">Global Systems</h3>
+          <p>Jet streams, trade winds, and ocean currents like El Niño shape regional weather.</p>
+        </div>
+        <div class="card p-6">
+          <h3 class="text-xl font-bold mb-2">Extreme Events</h3>
+          <p>Hurricanes, tornadoes, and heatwaves result from atmospheric instabilities.</p>
+        </div>
+        <div class="card p-6">
+          <img id="patterns-img" src="https://images.unsplash.com/photo-1504608521896-82d39774d67a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Weather patterns" class="w-full h-48 object-cover mb-4">
+          <p>Climate change intensifies these patterns, increasing event frequency and severity.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="forecasting" class="mb-12">
+      <h2 class="section-title text-3xl font-semibold mb-6 text-center">Weather Forecasting</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="card p-6">
+          <h3 class="text-xl font-bold mb-2">Data Collection</h3>
+          <p>Satellites, radar, and ground stations collect temperature, humidity, and wind data.</p>
+        </div>
+        <div class="card p-6">
+          <h3 class="text-xl font-bold mb-2">Modeling</h3>
+          <p>Supercomputers run numerical models to predict future weather based on current data.</p>
+        </div>
+        <div class="card p-6">
+          <h3 class="text-xl font-bold mb-2">Accuracy</h3>
+          <p>Forecasts are most reliable within 7 days, with accuracy decreasing for longer ranges.</p>
+        </div>
+        <div class="card p-6">
+          <img id="forecasting-img" src="https://images.unsplash.com/photo-1616249806542-8e6a4f141b1b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Weather radar" class="w-full h-48 object-cover mb-4">
+          <p>AI improves predictions by analyzing vast datasets for patterns.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="news" class="mb-12">
+      <h2 class="section-title text-3xl font-semibold mb-6 text-center">Recent Weather News</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="card p-6">
+          <img id="chicago-img" src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Chicago skyline" class="w-full h-48 object-cover mb-4">
+          <h3 class="text-xl font-bold mb-2">Chicago AQI Glitch</h3>
+          <p>Weather apps falsely reported hazardous AQI levels in Chicago, causing panic. <a href="https://www.nytimes.com/2025/04/24/us/chicago-air-quality-weather-apps.html" target="_blank" class="news-link">Read more</a></p>[](https://www.nytimes.com/2025/04/23/weather/chicago-air-quality.html)
+        </div>
+        <div class="card p-6">
+          <img id="delhi-img" src="https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Delhi weather" class="w-full h-48 object-cover mb-4">
+          <h3 class="text-xl font-bold mb-2">Delhi Heatwave</h3>
+          <p>Delhi faced record-breaking heat in April 2025, impacting air quality. <a href="https://www.aajtak.in/weather/news/story/delhi-air-quality-index-aqi-today-realtime-air-pollution-delhi-status-2095241-2025-04-25" target="_blank" class="news-link">Read more</a></p>[](https://www.aajtak.in/weather/delhi-air-quality-index-aqi-today)
+        </div>
+        <div class="card p-6">
+          <img id="hurricane-img" src="https://images.unsplash.com/photo-1504608521896-82d39774d67a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Hurricane" class="w-full h-48 object-cover mb-4">
+          <h3 class="text-xl font-bold mb-2">Hurricane Season 2025</h3>
+          <p>NOAA predicts an active hurricane season with stronger storms. <a href="https://www.noaa.gov/news-release/noaa-predicts-above-normal-2025-atlantic-hurricane-season" target="_blank" class="news-link">Read more</a></p>
+        </div>
+        <div class="card p-6">
+          <img id="europe-img" src="https://images.unsplash.com/photo-1616249806542-8e6a4f141b1b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Europe heatwave" class="w-full h-48 object-cover mb-4">
+          <h3 class="text-xl font-bold mb-2">Europe Heatwave</h3>
+          <p>Europe faced extreme heat in 2025, breaking temperature records. <a href="https://www.bbc.com/news/world-europe-68912345" target="_blank" class="news-link">Read more</a></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="py-6 text-center bg-gray-800 light-mode:bg-gray-100 relative z-10">
+    <p class="text-gray-400 light-mode:text-gray-600">© 2025 Weather Insights. All rights reserved.</p>
+  </footer>
+
+  <script>
+    function toggleMode() {
+      const body = document.body;
+      const toggleIcon = document.querySelector('.toggle-btn i');
+      body.classList.toggle('light-mode');
+      toggleIcon.classList.toggle('fa-moon');
+      toggleIcon.classList.toggle('fa-sun');
+    }
+
+    async function fetchPexelsImage(query, fallbackUrl) {
+      const pexelsApiKey = 'cE6sOe58z5nxcG7JZX0g9w4pTkex5snh4gapCej3UYJ4I0xemubOkl1M';
+      const pexelsApiUrl = `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=1`;
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        const response = await fetch(pexelsApiUrl, {
+          headers: { Authorization: pexelsApiKey },
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          if (response.status === 429) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            return fetchPexelsImage(query, fallbackUrl);
+          }
+          throw new Error(`Pexels API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data.photos.length > 0 ? data.photos[0].src.large : fallbackUrl;
+      } catch (err) {
+        console.error('Error fetching Pexels image:', err.message);
+        return fallbackUrl;
+      }
+    }
+
+    async function loadImages() {
+      const images = [
+        { id: 'patterns-img', query: 'weather patterns', fallback: 'https://images.unsplash.com/photo-1504608521896-82d39774d67a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+        { id: 'forecasting-img', query: 'weather radar', fallback: 'https://images.unsplash.com/photo-1616249806542-8e6a4f141b1b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+        { id: 'chicago-img', query: 'chicago skyline', fallback: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+        { id: 'delhi-img', query: 'delhi city', fallback: 'https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+        { id: 'hurricane-img', query: 'hurricane', fallback: 'https://images.unsplash.com/photo-1504608521896-82d39774d67a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+        { id: 'europe-img', query: 'europe heatwave', fallback: 'https://images.unsplash.com/photo-1616249806542-8e6a4f141b1b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' }
+      ];
+
+      for (const { id, query, fallback } of images) {
+        const imgElement = document.getElementById(id);
+        if (imgElement) {
+          const src = await fetchPexelsImage(query, fallback);
+          imgElement.src = src;
+        }
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', loadImages);
+  </script>
+</body>
+</html>

@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>One Stop - News at One Destination</title>
+  <style>
+    :root {
+      --bg-color: #121212;
+      --text-color: #f0f0f0;
+      --subtext-color: #b0b0b0;
+      --accent: #4ea8de;
+      --accent-light: #90e0ef;
+      --input-bg: rgba(40, 40, 60, 0.95);
+      --card-border: rgba(144, 224, 239, 0.3);
+      --hover-shadow: rgba(144, 224, 239, 0.5);
+    }
+
+    body.light-mode {
+      --bg-color: #f7f9fc;
+      --text-color: #121212;
+      --subtext-color: #333;
+      --accent: #0077cc;
+      --accent-light: #00b7ff;
+      --input-bg: rgba(255, 255, 255, 0.8);
+      --card-border: rgba(0, 119, 204, 0.2);
+      --hover-shadow: rgba(0, 183, 255, 0.4);
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-color);
+      background-image: url('background.png');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: var(--text-color);
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    #modeToggle {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 100;
+      background-color: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      font-size: 0.85em;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    #modeToggle:hover {
+      background-color: var(--accent-light);
+    }
+
+    header {
+      background: linear-gradient(to bottom, #1f1f1f, transparent);
+      padding: 30px 10px 20px;
+      font-weight: bold;
+      font-size: 1.6em;
+      color: var(--text-color);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      text-shadow: 0px 0px 4px var(--accent);
+    }
+
+    body.light-mode header {
+      background: linear-gradient(to bottom, #e8f0f8, transparent);
+      text-shadow: none;
+    }
+
+    .subtitle {
+      font-size: 1em;
+      font-weight: normal;
+      margin-top: 5px;
+      color: var(--subtext-color);
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      padding: 10px 0;
+      background: rgba(255, 255, 255, 0.03);
+      font-size: 0.95em;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .navbar a {
+      color: var(--accent-light);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .navbar a:hover {
+      color: var(--text-color);
+    }
+
+    .search-container {
+      margin: 30px auto 20px;
+      max-width: 500px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+    }
+
+    .search-box {
+      width: 100%;
+      padding: 12px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      outline: none;
+      box-shadow: 0px 0px 8px var(--card-border);
+    }
+
+    ::placeholder {
+      color: #999;
+    }
+
+    .card-container {
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: start;
+      gap: 20px;
+      margin: 20px;
+      overflow-x: auto;
+      padding: 10px;
+      scroll-behavior: smooth;
+    }
+
+    .card-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    .card {
+      background: #000;
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 0;
+      min-width: 300px;
+      height: 250px;
+      backdrop-filter: blur(6px);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      color: var(--text-color);
+      position: relative;
+      flex-shrink: 0;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      perspective: 1000px;
+      transform-style: preserve-3d;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px var(--hover-shadow);
+    }
+
+    .card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.2), transparent 50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .card:hover::after {
+      opacity: 1;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.03);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.9em;
+      color: var(--subtext-color);
+    }
+
+    .card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      border-radius: 20px;
+      margin: 0;
+    }
+
+    .card-content {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      right: 10px;
+      color: #fff;
+      font-size: 1.2em;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.5);
+      padding: 5px;
+      border-radius: 5px;
+      transform: translateZ(20px);
+    }
+
+    .loader-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      width: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 2;
+      transform: translateZ(30px);
+    }
+
+    .loader {
+      width: 40px;
+      height: 40px;
+      border: 5px solid #e0e0e0;
+      border-top: 5px solid #007BFF;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    #floraFaunaCard, #culturalFestivalsCard {
+      position: relative;
+      overflow: hidden;
+      border-radius: 20px;
+      background: #000;
+    }
+
+    .flora-image, .festival-image {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: none;
+      transform: translateZ(10px);
+    }
+
+    .flora-image-img, .festival-image-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 20px;
+      z-index: -1;
+    }
+
+    .flora-image-text, .festival-image-text {
+      position: absolute;
+      bottom: 15px;
+      left: 20px;
+      font-size: 1.2em;
+      font-weight: bold;
+      color: white;
+      text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.5);
+      padding: 5px;
+      border-radius: 5px;
+      transform: translateZ(20px);
+    }
+  </style>
+</head>
+<body>
+  <button id="modeToggle" onclick="toggleMode()">🌙</button>
+  <header>
+    ONE STOP
+    <div class="subtitle">NEWS AT ONE DESTINATION</div>
+  </header>
+
+  <nav class="navbar">
+    <a href="front.html">Home</a>
+    <a href="weather.html">Weather</a>
+    <a href="aqi.html">AQI</a>
+    <a href="flora_fauna.html">Flora & Fauna</a>
+    <a href="festival.html">Festivals</a>
+    <a href="#">About Us</a>
+  </nav>
+
+  <div class="search-container">
+    <input type="text" class="search-box" placeholder="Enter a location (state/country)" onkeydown="typeof handleSearch === 'function' ? handleSearch(event) : console.warn('handleSearch not defined')">
+  </div>
+
+  <div class="card-container" id="cardContainer">
+    <div class="card" id="weatherCard">
+      <img src="weather.png" alt="Weather">
+      <div class="card-content">Weather Info</div>
+    </div>
+    <div class="card" id="aqiCard">
+      <img src="images/aqi.png" alt="AQI">
+      <div class="card-content">Air Quality Index</div>
+    </div>
+    <div class="card" id="floraFaunaCard">
+      <img src="images/flora_fauna.png" alt="Flora & Fauna">
+      <div class="card-content">Flora & Fauna</div>
+    </div>
+    <div class="card" id="tourismCard">
+      <img src="images/tourism.png" alt="Tourism">
+      <div class="card-content">Tourism</div>
+    </div>
+    <div class="card" id="culturalFestivalsCard">
+      <img src="images/festival.png" alt="Festivals">
+      <div class="card-content">Cultural Festivals</div>
+    </div>    
+  </div>
+
+  <footer>
+    © 2025 One Stop News. All rights reserved.
+  </footer>
+
+  <script>
+    // 3D Card Tilt Effect
+    document.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const cardWidth = rect.width;
+        const cardHeight = rect.height;
+        const centerX = rect.left + cardWidth / 2;
+        const centerY = rect.top + cardHeight / 2;
+        const mouseX = e.clientX - centerX;
+        const mouseY = e.clientY - centerY;
+
+        // Calculate rotation angles (max 15 degrees)
+        const rotateX = (mouseY / cardHeight) * -15;
+        const rotateY = (mouseX / cardWidth) * 15;
+
+        // Apply 3D transform
+        card.style.transform = `
+          perspective(1000px)
+          rotateX(${rotateX}deg)
+          rotateY(${rotateY}deg)
+          scale(1.05)
+        `;
+
+        // Update glare position
+        const glare = card.querySelector('::after');
+        if (glare) {
+          const glareX = (mouseX / cardWidth) * 100 + 50;
+          const glareY = (mouseY / cardHeight) * 100 + 50;
+          card.style.setProperty('--glare-x', `${glareX}%`);
+          card.style.setProperty('--glare-y', `${glareY}%`);
+        }
+      });
+
+      card.addEventListener('mouseleave', () => {
+        // Reset transform
+        card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)';
+        card.style.setProperty('--glare-x', '50%');
+        card.style.setProperty('--glare-y', '50%');
+      });
+    });
+
+    async function fetchWeather(city) {
+      const weatherCard = document.getElementById('weatherCard');
+      weatherCard.innerHTML = `<div class="loader-container"><div class="loader"></div></div>`;
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        const res = await fetch(`https://api.weatherapi.com/v1/current.json?key=70516f959d1e4612b9e135848251204&q=${encodeURIComponent(city)}`, { signal: controller.signal });
+        clearTimeout(timeoutId);
+
+        if (!res.ok) {
+          throw new Error(`WeatherAPI error: ${res.status} ${res.statusText}`);
+        }
+        const data = await res.json();
+
+        if (data.error) {
+          throw new Error(data.error.message || 'Unable to fetch weather data');
+        }
+
+        const weatherCondition = data.current.condition.text.toLowerCase();
+        let imageSrc = 'images/weather.png';
+
+        if (weatherCondition.includes('rain')) {
+          imageSrc = 'images/rainy.png';
+        } else if (weatherCondition.includes('sunny')) {
+          imageSrc = 'weather.png';
+        } else if (weatherCondition.includes('cloud')) {
+          imageSrc = 'images/cloudy.png';
+        } else if (weatherCondition.includes('snow')) {
+          imageSrc = 'images/snow.png';
+        } else if (weatherCondition.includes('overcast')) {
+          imageSrc = 'images/overcast.png';
+        }
+
+        weatherCard.innerHTML = `
+          <img src="${imageSrc}" alt="Weather">
+          <div class="card-content">🌡 Temp: ${data.current.temp_c}°C\n☁ Condition: ${data.current.condition.text}</div>
+        `;
+      } catch (err) {
+        console.error('Error fetching weather data:', {
+          message: err.message,
+          name: err.name,
+          stack: err.stack
+        });
+        weatherCard.innerHTML = `
+          <img src="images/weather.png" alt="Weather">
+          <div class="card-content">Error: ${err.message}</div>
+        `;
+      }
+    }
+
+    async function fetchAQI(city) {
+      const aqiCard = document.getElementById('aqiCard');
+      aqiCard.innerHTML = `<div class="loader-container"><div class="loader"></div></div>`;
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        const geoRes = await fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=128245ddc60c649966179ab104c539fe`, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        const geoData = await geoRes.json();
+        if (!geoData.length) {
+          throw new Error('City not found');
+        }
+        const { lat, lon } = geoData[0];
+
+        const res = await fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=128245ddc60c649966179ab104c539fe`, { signal: controller.signal });
+        const data = await res.json();
+
+        if (!data.list || !data.list[0]) {
+          throw new Error('Unable to fetch AQI data');
+        }
+
+        const aqi = data.list[0].main.aqi;
+        let aqiStatus = '';
+        let keyword = '';
+
+        if (aqi === 1) {
+          aqiStatus = 'Good';
+          keyword = 'clean air';
+        } else if (aqi === 2) {
+          aqiStatus = 'Fair';
+          keyword = 'air quality';
+        } else if (aqi === 3) {
+          aqiStatus = 'Moderate';
+          keyword = 'air pollution';
+        } else if (aqi === 4) {
+          aqiStatus = 'Poor';
+          keyword = 'air pollution';
+        } else if (aqi === 5) {
+          aqiStatus = 'Very Poor';
+          keyword = 'hazardous air';
+        } else {
+          throw new Error('Invalid AQI value');
+        }
+
+        const imageUrl = await fetchPexelsImage(keyword);
+
+        aqiCard.innerHTML = `
+          <img src="${imageUrl}" alt="AQI">
+          <div class="card-content">AQI: ${aqi} (${aqiStatus})</div>
+        `;
+      } catch (err) {
+        console.error('Error fetching AQI data:', {
+          message: err.message,
+          name: err.name,
+          stack: err.stack
+        });
+        aqiCard.innerHTML = `
+          <img src="images/aqi.png" alt="AQI">
+          <div class="card-content">Error: ${err.message}</div>
+        `;
+      }
+    }
+
+    async function fetchPexelsImage(query, usedImageUrls = []) {
+      const pexelsApiKey = 'cE6sOe58z5nxcG7JZX0g9w4pTkex5snh4gapCej3UYJ4I0xemubOkl1M';
+      const pexelsApiUrl = `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=5`;
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        const response = await fetch(pexelsApiUrl, {
+          headers: {
+            Authorization: pexelsApiKey
+          },
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          if (response.status === 429) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            return await fetchPexelsImage(query, usedImageUrls);
+          }
+          throw new Error(`Pexels API returned ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        const availableImages = data.photos
+          .map(photo => photo.src.large)
+          .filter(url => !usedImageUrls.includes(url));
+
+        if (availableImages.length === 0 && query !== 'festival') {
+          return await fetchPexelsImage('festival', usedImageUrls);
+        }
+
+        return availableImages.length > 0 ? availableImages[0] : 'images/festival.png';
+      } catch (err) {
+        console.error('Error fetching image from Pexels:', {
+          message: err.message,
+          name: err.name,
+          stack: err.stack
+        });
+        return 'images/festival.png';
+      }
+    }
+
+    async function fetchFloraFaunaInaturalist(city) {
+      const floraFaunaCard = document.getElementById('floraFaunaCard');
+      floraFaunaCard.innerHTML = `<div class="loader-container"><div class="loader"></div></div>`;
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        const geoRes = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${city}&key=ce57824a697c4e009d2160f64948cc54`, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        const geoData = await geoRes.json();
+        const lat = geoData.results[0]?.geometry.lat;
+        const lon = geoData.results[0]?.geometry.lng;
+
+        if (!lat || !lon) {
+          throw new Error('Location not found');
+        }
+
+        const res = await fetch(`https://api.inaturalist.org/v1/observations?lat=${lat}&lng=${lon}&per_page=10`, { signal: controller.signal });
+        const data = await res.json();
+
+        if (data.results.length > 0) {
+          const observations = data.results
+            .filter(obs => obs.taxon?.default_photo?.medium_url)
+            .map(obs => ({
+              speciesName: obs.species_guess || 'Unknown species',
+              observationDate: obs.observed_on || 'Unknown date',
+              imageUrl: obs.taxon.default_photo.medium_url
+            }));
+
+          if (observations.length === 0) {
+            throw new Error(`No flora & fauna images found for ${city}`);
+          }
+
+          const imageHtmlArray = observations.map(obs => `
+            <div class="flora-image">
+              <img src="${obs.imageUrl}" alt="${obs.speciesName}" class="flora-image-img">
+              <div class="flora-image-text">${obs.speciesName}</div>
+            </div>
+          `);
+
+          floraFaunaCard.innerHTML = imageHtmlArray.join('');
+          setTimeout(() => startImageGallery(), 100);
+        } else {
+          throw new Error(`No flora & fauna observations found for ${city}`);
+        }
+      } catch (err) {
+        console.error('Error fetching flora & fauna data:', {
+          message: err.message,
+          name: err.name,
+          stack: err.stack
+        });
+        floraFaunaCard.innerHTML = `
+          <img src="images/flora_fauna.png" alt="Flora & Fauna">
+          <div class="card-content">Error: ${err.message}</div>
+        `;
+      }
+    }
+
+    function startImageGallery() {
+      const floraCard = document.getElementById('floraFaunaCard');
+      const images = floraCard.getElementsByClassName('flora-image');
+      let currentIndex = 0;
+
+      if (images.length === 0) return;
+
+      for (let img of images) {
+        img.style.display = 'none';
+      }
+
+      images[currentIndex].style.display = 'block';
+
+      setInterval(() => {
+        images[currentIndex].style.display = 'none';
+        currentIndex = (currentIndex + 1) % images.length;
+        images[currentIndex].style.display = 'block';
+      }, 3000);
+    }
+
+    async function fetchCulturalFestivals(city) {
+      const culturalCard = document.getElementById('culturalFestivalsCard');
+      culturalCard.innerHTML = `<div class="loader-container"><div class="loader"></div></div>`;
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        const geoRes = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(city)}&key=ce57824a697c4e009d2160f64948cc54`, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        const geoData = await geoRes.json();
+        const lat = geoData.results[0]?.geometry.lat;
+        const lng = geoData.results[0]?.geometry.lng;
+
+        if (!lat || !lng) {
+          throw new Error('Unable to geocode city');
+        }
+
+        const predictHQApiKey = 'qPZl-Ocp0oMZXDOSbc_zcfVfdySu7723FANp36Y_';
+        const today = new Date().toISOString().split('T')[0];
+        const response = await fetch(`https://api.predicthq.com/v1/events/?category=festivals&location_around.origin=${lat},${lng}&active.gte=${today}&limit=3`, {
+          headers: {
+            Authorization: `Bearer ${predictHQApiKey}`
+          },
+          signal: controller.signal
+        });
+
+        if (!response.ok) {
+          throw new Error(`PredictHQ API error: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        const festivals = data.results
+          .map(event => ({
+            name: event.title,
+            date: new Date(event.start).toLocaleString('default', { month: 'long' })
+          }));
+
+        if (festivals.length === 0) {
+          throw new Error(`No festivals found for ${city}`);
+        }
+
+        const usedImageUrls = [];
+        const festivalData = await Promise.all(
+          festivals.map(async festival => {
+            const imageUrl = await fetchPexelsImage(festival.name, usedImageUrls);
+            usedImageUrls.push(imageUrl);
+            return { ...festival, imageUrl };
+          })
+        );
+
+        const imageHtmlArray = festivalData.map(festival => `
+          <div class="festival-image">
+            <img src="${festival.imageUrl}" alt="${festival.name}" class="festival-image-img">
+            <div class="festival-image-text">${festival.name} (${festival.date})</div>
+          </div>
+        `);
+
+        culturalCard.innerHTML = imageHtmlArray.join('');
+        setTimeout(() => startFestivalGallery(), 100);
+      } catch (err) {
+        console.error('Error fetching cultural festivals:', {
+          message: err.message,
+          name: err.name,
+          stack: err.stack
+        });
+        let errorMessage = 'Unable to fetch festival data';
+        if (err.message.includes('No festivals found')) {
+          errorMessage = `No festivals found for ${city}`;
+        } else if (err.message) {
+          errorMessage = err.message;
+        }
+        culturalCard.innerHTML = `
+          <img src="images/festival.png" alt="Festivals">
+          <div class="card-content">Error: ${errorMessage}</div>
+        `;
+      }
+    }
+
+    let festivalInterval = null;
+    function startFestivalGallery() {
+      const festivalCard = document.getElementById('culturalFestivalsCard');
+      const images = festivalCard.getElementsByClassName('festival-image');
+      let currentIndex = 0;
+
+      if (festivalInterval) {
+        clearInterval(festivalInterval);
+      }
+
+      if (images.length === 0) return;
+
+      for (let img of images) {
+        img.style.display = 'none';
+      }
+
+      images[currentIndex].style.display = 'block';
+
+      festivalInterval = setInterval(() => {
+        images[currentIndex].style.display = 'none';
+        currentIndex = (currentIndex + 1) % images.length;
+        images[currentIndex].style.display = 'block';
+      }, 3000);
+    }
+
+    async function fetchTourismImages(city) {
+      const tourismCard = document.getElementById('tourismCard');
+      tourismCard.innerHTML = `<div class="loader-container"><div class="loader"></div></div>`;
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        const apiKey = '49962369-5988e4c9d1ad43c437a8038e4';
+        const response = await fetch(`https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(city + ' landmarks')}&image_type=photo&per_page=10`, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        const data = await response.json();
+
+        if (data.hits.length === 0) {
+          throw new Error(`No tourism images found for ${city}`);
+        }
+
+        const uniqueImages = [...new Set(data.hits.map(image => image.webformatURL))];
+
+        if (uniqueImages.length === 0) {
+          throw new Error(`No unique tourism images found for ${city}`);
+        }
+
+        tourismCard.innerHTML = `
+          <img src="${uniqueImages[0]}" alt="Tourism">
+          <div class="card-content">Tourism in ${city}</div>
+        `;
+
+        let currentIndex = 0;
+        setInterval(() => {
+          currentIndex = (currentIndex + 1) % uniqueImages.length;
+          const tourismImage = tourismCard.querySelector('img');
+          if (tourismImage) {
+            tourismImage.src = uniqueImages[currentIndex];
+          }
+        }, 2000);
+      } catch (err) {
+        console.error('Error fetching tourism images:', {
+          message: err.message,
+          name: err.name,
+          stack: err.stack
+        });
+        tourismCard.innerHTML = `
+          <img src="images/tourism.png" alt="Tourism">
+          <div class="card-content">Error: ${err.message}</div>
+        `;
+      }
+    }
+
+    async function handleSearch(event) {
+      if (event.key === 'Enter') {
+        const city = event.target.value.trim();
+        if (!city) return;
+
+        const loaderHTML = `<div class="loader-container"><div class="loader"></div></div>`;
+
+        document.getElementById('weatherCard').innerHTML = `
+          <img src="images/weather.png" alt="Weather">
+          ${loaderHTML}
+        `;
+        document.getElementById('aqiCard').innerHTML = `
+          <img src="images/aqi.png" alt="AQI">
+          ${loaderHTML}
+        `;
+        document.getElementById('floraFaunaCard').innerHTML = `
+          <img src="images/flora_fauna.png" alt="Flora & Fauna">
+          ${loaderHTML}
+        `;
+        document.getElementById('culturalFestivalsCard').innerHTML = `
+          <img src="images/festival.png" alt="Festivals">
+          ${loaderHTML}
+        `;
+        document.getElementById('tourismCard').innerHTML = `
+          <img src="images/tourism.png" alt="Tourism">
+          ${loaderHTML}
+        `;
+
+        try {
+          await fetchWeather(city);
+        } catch {
+          document.getElementById('weatherCard').innerHTML = `
+            <img src="images/weather.png" alt="Weather">
+            <div class="card-content">Weather data unavailable</div>
+          `;
+        }
+
+        try {
+          await fetchAQI(city);
+        } catch {
+          document.getElementById('aqiCard').innerHTML = `
+            <img src="images/aqi.png" alt="AQI">
+            <div class="card-content">AQI data unavailable</div>
+          `;
+        }
+
+        try {
+          await fetchFloraFaunaInaturalist(city);
+        } catch {
+          document.getElementById('floraFaunaCard').innerHTML = `
+            <img src="images/flora_fauna.png" alt="Flora & Fauna">
+            <div class="card-content">Flora & Fauna data unavailable</div>
+          `;
+        }
+
+        try {
+          await fetchCulturalFestivals(city);
+        } catch {
+          document.getElementById('culturalFestivalsCard').innerHTML = `
+            <img src="images/festival.png" alt="Festivals">
+            <div class="card-content">Festival data unavailable</div>
+          `;
+        }
+
+        try {
+          await fetchTourismImages(city);
+        } catch {
+          document.getElementById('tourismCard').innerHTML = `
+            <img src="images/tourism.png" alt="Tourism">
+            <div class="card-content">Tourism data unavailable</div>
+          `;
+        }
+      }
+    }
+
+    document.querySelectorAll('.card').forEach((card, index) => {
+      card.addEventListener('click', function (e) {
+        const container = document.getElementById('cardContainer');
+        const rect = card.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+
+        if (clickX < 30 && index > 0) {
+          container.children[index - 1].scrollIntoView({ behavior: 'smooth', inline: 'center' });
+        } else if (clickX > rect.width - 30 && index < container.children.length - 1) {
+          container.children[index + 1].scrollIntoView({ behavior: 'smooth', inline: 'center' });
+        }
+      });
+    });
+
+    window.addEventListener("DOMContentLoaded", () => {
+      document.querySelector(".search-box").focus();
+    });
+
+    function toggleMode() {
+      const body = document.body;
+      const button = document.getElementById('modeToggle');
+      body.classList.toggle('light-mode');
+      if (body.classList.contains('light-mode')) {
+        button.textContent = "🌞";
+      } else {
+        button.textContent = "🌙";
+      }
+    }
+  </script>
+</body>
+</html>

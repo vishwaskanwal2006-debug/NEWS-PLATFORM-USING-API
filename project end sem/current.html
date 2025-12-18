@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Current Affairs</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f0f;
+      color: #e0e0e0;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.light {
+      background: #ffffff;
+      color: #000000;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: #1a1a1a;
+    }
+    body.light header {
+      background: #f0f0f0;
+    }
+    .actions button {
+      font-size: 1.2rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: inherit;
+    }
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin: 1rem 2rem;
+    }
+    .filters select {
+      padding: 0.5rem;
+      border-radius: 5px;
+      background: #1e1e1e;
+      color: #e0e0e0;
+      border: 1px solid #444;
+    }
+    body.light .filters select {
+      background: #fff;
+      color: #000;
+      border: 1px solid #ccc;
+    }
+    .news-container {
+      padding: 1rem 2rem;
+    }
+    .news-item {
+      margin: 1rem 0;
+      padding: 1rem;
+      background: #1a1a1a;
+      border-radius: 8px;
+      transition: background 0.3s;
+    }
+    body.light .news-item {
+      background: #f2f2f2;
+    }
+    .news-item a {
+      color: #00bfff;
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+    .news-item a:hover {
+      text-decoration: underline;
+    }
+    .news-item p {
+      margin: 0.5rem 0;
+    }
+    .news-item small {
+      font-size: 0.9rem;
+      color: #888;
+    }
+    body.light .news-item small {
+      color: #666;
+    }
+    #loadMoreBtn {
+      display: block;
+      margin: 1rem auto;
+      padding: 0.6rem 1.5rem;
+      font-size: 1rem;
+      background-color: #00bfff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    #loadMoreBtn:hover {
+      background-color: #0099cc;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>📰 Current Affairs</h1>
+    <div class="actions">
+      <button id="toggleTheme">🌙</button>
+    </div>
+  </header>
+
+  <div class="filters">
+    <select id="categorySelector">
+      <option value="general">General</option>
+      <option value="business">Business</option>
+      <option value="politics">Politics</option>
+    </select>
+
+    <select id="dateRangeSelector">
+      <option value="recent">Recent</option>
+      <option value="week">Last Week</option>
+      <option value="month">Last Month</option>
+      <option value="year">Last Year</option>
+    </select>
+  </div>
+
+  <div class="news-container" id="newsContainer">
+    <!-- News articles appear here -->
+  </div>
+
+  <button id="loadMoreBtn">Load More</button>
+
+  <script>
+    const API_KEY = '63d6cd9aec9c47f49fc44353e4a55ba0'; // Replace with your actual API key
+    const newsContainer = document.getElementById('newsContainer');
+    const toggleBtn = document.getElementById('toggleTheme');
+    const categorySelector = document.getElementById('categorySelector');
+    const dateRangeSelector = document.getElementById('dateRangeSelector');
+    const countrySelector = document.getElementById('countrySelector');
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+
+    let currentPage = 1;
+
+    toggleBtn.addEventListener('click', () => {
+      document.body.classList.toggle('light');
+      toggleBtn.textContent = document.body.classList.contains('light') ? '🌞' : '🌙';
+    });
+
+    function getDateRange(value) {
+      const today = new Date();
+      let fromDate = new Date();
+
+      switch (value) {
+        case 'week':
+          fromDate.setDate(today.getDate() - 7);
+          break;
+        case 'month':
+          fromDate.setMonth(today.getMonth() - 1);
+          break;
+        case 'year':
+          fromDate.setFullYear(today.getFullYear() - 1);
+          break;
+        default:
+          fromDate = today;
+      }
+      return fromDate.toISOString().split('T')[0];
+    }
+
+    async function fetchNews(isLoadMore = false) {
+      if (!isLoadMore) {
+        currentPage = 1;
+        newsContainer.innerHTML = '<p>Loading...</p>';
+      }
+
+      const category = categorySelector.value;
+      const range = dateRangeSelector.value;
+      const country = countrySelector.value;
+      const from = getDateRange(range);
+      const to = new Date().toISOString().split('T')[0];
+
+      try {
+        const query = `${category}${country ? ' AND country:' + country : ''}`;
+        const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&from=${from}&to=${to}&sortBy=publishedAt&pageSize=10&page=${currentPage}&apiKey=${API_KEY}`;
+        const res = await fetch(url);
+
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+
+        const data = await res.json();
+
+        if (!data.articles || data.articles.length === 0) {
+          if (!isLoadMore) newsContainer.innerHTML = '<p>No news found.</p>';
+          return;
+        }
+
+        const newsHTML = data.articles.map(article => {
+          const title = article.title || 'Untitled';
+          const url = article.url || '#';
+          const desc = article.description || '';
+          const source = article.source?.name || 'Unknown';
+          const publishedAt = new Date(article.publishedAt).toLocaleString();
+
+          return `
+            <div class="news-item">
+              <a href="${url}" target="_blank">${title}</a>
+              <p>${desc}</p>
+              <small>Source: ${source} | ${publishedAt}</small>
+            </div>
+          `;
+        }).join('');
+
+        if (isLoadMore) {
+          newsContainer.insertAdjacentHTML('beforeend', newsHTML);
+        } else {
+          newsContainer.innerHTML = newsHTML;
+        }
+
+        currentPage++;
+      } catch (err) {
+        newsContainer.innerHTML = '<p>Error fetching news. Try again later.</p>';
+        console.error(err);
+      }
+    }
+
+    // Event Listeners
+    categorySelector.addEventListener('change', () => fetchNews());
+    dateRangeSelector.addEventListener('change', () => fetchNews());
+    countrySelector.addEventListener('change', () => fetchNews());
+    loadMoreBtn.addEventListener('click', () => fetchNews(true));
+
+    // Initial fetch
+    fetchNews();
+  </script>
+
+</body>
+</html>

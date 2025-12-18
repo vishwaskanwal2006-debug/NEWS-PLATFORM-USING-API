@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-behavior: smooth;">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Flora & Fauna Insights</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap">
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      --text-color: #fff;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --header-bg: rgba(0, 0, 0, 0.7);
+      --footer-bg: rgba(0, 0, 0, 0.6);
+      --modal-text-color: #fff;
+      --nav-bg: rgba(255, 255, 255, 0.1);
+      --nav-border: rgba(255, 255, 255, 0.2);
+    }
+
+    body.light-mode {
+      --bg-gradient: linear-gradient(to right, #f0f0f0, #ffffff, #e0e0e0);
+      --text-color: #111;
+      --card-bg: rgba(0, 0, 0, 0.05);
+      --header-bg: rgba(255, 255, 255, 0.7);
+      --footer-bg: rgba(255, 255, 255, 0.6);
+      --modal-text-color: #000;
+      --nav-bg: rgba(0, 0, 0, 0.1);
+      --nav-border: rgba(0, 0, 0, 0.2);
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-color);
+      transition: background 0.5s, color 0.5s;
+    }
+
+    header {
+      padding: 1rem;
+      background: var(--header-bg);
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.2rem;
+      font-weight: 700;
+    }
+
+    #toggle-theme {
+      position: absolute;
+      right: 1rem;
+      top: 1rem;
+      background: transparent;
+      border: 2px solid var(--text-color);
+      color: var(--text-color);
+      padding: 0.3rem 0.6rem;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    #toggle-theme:hover {
+      background: var(--text-color);
+      color: var(--bg-gradient);
+    }
+
+    nav {
+      background: var(--nav-bg);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--nav-border);
+      padding: 0.5rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      text-align: center;
+    }
+
+    nav a {
+      color: var(--text-color);
+      text-decoration: none;
+      margin: 0 1rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    nav a:hover {
+      color: #87cefa;
+    }
+
+    .articles {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .section-title {
+      width: 100%;
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 1rem 0;
+      animation: fadeInScale 0.8s ease-in-out;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 15px;
+      margin: 1rem;
+      width: 300px;
+      padding: 1rem;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+    }
+
+    .card:nth-child(odd) {
+      animation: slideInLeft 0.6s ease-in-out forwards;
+      animation-delay: calc(var(--order) * 0.2s);
+    }
+
+    .card:nth-child(even) {
+      animation: slideInRight 0.6s ease-in-out forwards;
+      animation-delay: calc(var(--order) * 0.2s);
+    }
+
+    .card:hover {
+      transform: rotateY(5deg) rotateX(5deg);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
+    }
+
+    .card img {
+      max-width: 100%;
+      border-radius: 10px;
+    }
+
+    .card h2 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-top: 0.5rem;
+    }
+
+    .card p {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      font-weight: 400;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.95rem;
+      font-weight: 400;
+      background: var(--footer-bg);
+      margin-top: 2rem;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      display: flex;
+      flex-wrap: wrap;
+      background: var(--card-bg);
+      color: var(--modal-text-color);
+      width: 90%;
+      max-width: 900px;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 0 10px #000;
+      animation: zoomIn 0.4s ease;
+    }
+
+    .modal-left, .modal-right {
+      flex: 1;
+      padding: 1rem;
+    }
+
+    .modal-left img {
+      width: 100%;
+      border-radius: 10px;
+    }
+
+    .modal-right h2 {
+      margin-top: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 2rem;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .news-link {
+      color: lightblue;
+      text-decoration: underline;
+    }
+
+    .news-link:hover {
+      color: #87cefa;
+    }
+
+    @media (max-width: 700px) {
+      .modal-content {
+        flex-direction: column;
+      }
+      nav a {
+        margin: 0 0.5rem;
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .card {
+        width: 90%;
+      }
+      #toggle-theme {
+        top: 0.5rem;
+        right: 0.5rem;
+      }
+      nav a {
+        display: block;
+        margin: 0.5rem 0;
+      }
+      header h1 {
+        font-size: 1.8rem;
+      }
+      .section-title {
+        font-size: 1.6rem;
+      }
+    }
+
+    @keyframes fadeInScale {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes zoomIn {
+      from {
+        opacity: 0;
+        transform: scale(0.7);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🌿 Flora & Fauna Insights</h1>
+    <button id="toggle-theme" aria-label="Toggle theme" title="Toggle light/dark mode">🌙</button>
+  </header>
+
+  <nav>
+    <a href="#endangered">Endangered Species</a>
+    <a href="#extinct">Extinct Species</a>
+    <a href="#popular">Popular Species</a>
+    <a href="#news">News</a>
+  </nav>
+
+  <section class="articles" id="articles">
+    <h2 class="section-title" id="endangered">Endangered Species</h2>
+    <p style="text-align: center; width: 100%;">Loading...</p>
+    <h2 class="section-title" id="extinct">Extinct Species</h2>
+    <p style="text-align: center; width: 100%;">Loading...</p>
+    <h2 class="section-title" id="popular">Popular Species</h2>
+    <p style="text-align: center; width: 100%;">Loading...</p>
+    <h2 class="section-title" id="news">News</h2>
+    <p style="text-align: center; width: 100%;">Loading...</p>
+  </section>
+
+  <footer>
+    <p>Powered by Pexels API | Flora & Fauna Conservation Insights</p>
+  </footer>
+
+  <!-- Modal -->
+  <div class="modal" id="modal">
+    <div class="modal-close" id="modal-close">×</div>
+    <div class="modal-content" id="modal-content">
+      <div class="modal-left" id="modal-media"></div>
+      <div class="modal-right" id="modal-info"></div>
+    </div>
+  </div>
+
+  <script>
+    const pexelsApiKey = 'cE6sOe58z5nxcG7JZX0g9w4pTkex5snh4gapCej3UYJ4I0xemubOkl1M';
+    const articlesContainer = document.getElementById('articles');
+    const toggleBtn = document.getElementById('toggle-theme');
+    const modal = document.getElementById('modal');
+    const modalClose = document.getElementById('modal-close');
+    const modalMedia = document.getElementById('modal-media');
+    const modalInfo = document.getElementById('modal-info');
+    const imageCache = new Map();
+
+    function setTheme(mode) {
+      const isLight = mode === 'light';
+      document.body.classList.toggle('light-mode', isLight);
+      toggleBtn.textContent = isLight ? '🌙' : '☀️';
+      localStorage.setItem('theme', mode);
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      const isCurrentlyLight = document.body.classList.contains('light-mode');
+      setTheme(isCurrentlyLight ? 'dark' : 'light');
+    });
+
+    function applySavedTheme() {
+      const saved = localStorage.getItem('theme') || 'dark';
+      setTheme(saved);
+    }
+
+    async function fetchPexelsImage(query, fallbackUrl) {
+      if (imageCache.has(query)) {
+        return imageCache.get(query);
+      }
+
+      const pexelsApiUrl = `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=1`;
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        const response = await fetch(pexelsApiUrl, {
+          headers: { Authorization: pexelsApiKey },
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          if (response.status === 429) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            return fetchPexelsImage(query, fallbackUrl);
+          }
+          throw new Error(`Pexels API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const url = data.photos.length > 0 ? data.photos[0].src.large : fallbackUrl;
+        imageCache.set(query, url);
+        return url;
+      } catch (err) {
+        console.error('Error fetching Pexels image:', err.message);
+        imageCache.set(query, fallbackUrl);
+        return fallbackUrl;
+      }
+    }
+
+    const speciesData = {
+      endangered: [
+        {
+          title: 'Siamese Crocodile',
+          description: 'Critically endangered, with only about 400 individuals left in the wild, this crocodile has made a comeback with 60 eggs hatching in Cambodia in 2024.',
+          query: 'Siamese crocodile',
+          fallback: 'https://images.unsplash.com/photo-1516683030153-9f8b8e8c482b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://www.fauna-flora.org/species/siamese-crocodile/'
+        },
+        {
+          title: 'Irwin’s Turtle',
+          description: 'Named after Steve Irwin, this turtle is threatened by disease, habitat destruction, and invasive species, listed as endangered in Australia.',
+          query: 'Irwin’s turtle',
+          fallback: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://www.australiangeographic.com.au/topics/wildlife/2018/06/irwins-turtle-endangered-elseya-irwini/'
+        },
+        {
+          title: 'Bengal Tiger',
+          description: 'Endangered due to poaching and habitat loss, with populations declining despite conservation efforts in India.',
+          query: 'Bengal tiger',
+          fallback: 'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://www.worldwildlife.org/species/bengal-tiger'
+        },
+        {
+          title: 'Mountain Chicken Frog',
+          description: 'Critically endangered, this frog faces habitat loss and illegal pet trade in its Tanzanian montane forest habitat.',
+          query: 'Mountain chicken frog',
+          fallback: 'https://images.unsplash.com/photo-1516684669134-17df2ee6a1ca?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://www.fauna-flora.org/species/mountain-chicken/'
+        },
+        {
+          title: 'Amur Leopard',
+          description: 'One of the rarest big cats, with fewer than 100 individuals left in the wild, threatened by poaching and habitat loss.',
+          query: 'Amur leopard',
+          fallback: 'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://www.worldwildlife.org/species/amur-leopard'
+        },
+        {
+          title: 'Javan Rhino',
+          description: 'With around 75 individuals left in Indonesia’s Ujung Kulon National Park, this rhino is critically endangered.',
+          query: 'Javan rhino',
+          fallback: 'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://www.iucnredlist.org/species/19495/18493990'
+        },
+        {
+          title: 'Vaquita',
+          description: 'The world’s smallest cetacean, with about 10 left in the Gulf of California, threatened by illegal fishing.',
+          query: 'Vaquita',
+          fallback: 'https://images.unsplash.com/photo-1516683030153-9f8b8e8c482b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://www.nationalgeographic.com/animals/mammals/facts/vaquita'
+        }
+      ],
+      extinct: [
+        {
+          title: 'Passenger Pigeon',
+          description: 'Once numbering in billions, this bird went extinct in the early 20th century due to hunting and habitat loss.',
+          query: 'Passenger Pigeon',
+          fallback: 'https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://en.wikipedia.org/wiki/Passenger_pigeon'
+        },
+        {
+          title: 'San Marcos Gambusia',
+          description: 'A small fish extinct since 1983 due to water overuse depleting its Texas spring habitat.',
+          query: 'San Marcos Gambusia',
+          fallback: 'https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://www.biologicaldiversity.org/species/fish/San_Marcos_gambusia/'
+        },
+        {
+          title: 'Scioto Madtom',
+          description: 'A small catfish from Ohio, last seen in 1957, extinct due to habitat destruction.',
+          query: 'Scioto Madtom',
+          fallback: 'https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://www.biologicaldiversity.org/species/fish/Scioto_madtom/'
+        },
+        {
+          title: 'Dodo',
+          description: 'Extinct since the 17th century, this flightless bird from Mauritius was hunted to oblivion.',
+          query: 'Dodo bird',
+          fallback: 'https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://en.wikipedia.org/wiki/Dodo'
+        },
+        {
+          title: 'Tasmanian Tiger',
+          description: 'A marsupial predator extinct in the 20th century due to hunting and habitat loss in Australia.',
+          query: 'Tasmanian tiger',
+          fallback: 'https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://australian.museum/learn/animals/mammals/thylacine/'
+        },
+        {
+          title: 'Great Auk',
+          description: 'A flightless seabird extinct in the 19th century due to overhunting for feathers and food.',
+          query: 'Great auk',
+          fallback: 'https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://www.si.edu/spotlight/great-auk'
+        }
+      ],
+      popular: [
+        {
+          title: 'Giant Panda',
+          description: 'A conservation success, the panda’s status improved from endangered to vulnerable due to breeding programs.',
+          query: 'Giant panda',
+          fallback: 'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://www.worldwildlife.org/species/giant-panda'
+        },
+        {
+          title: 'Bald Eagle',
+          description: 'Recovered from near extinction in the 1980s, now a symbol of conservation success in the US.',
+          query: 'Bald eagle',
+          fallback: 'https://images.unsplash.com/photo-1516684669134-17df2ee6a1ca?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://www.nationalgeographic.com/animals/birds/facts/bald-eagle'
+        },
+        {
+          title: 'Blue Whale',
+          description: 'The largest animal on Earth, protected under the Endangered Species Act, with recovering populations.',
+          query: 'Blue whale',
+          fallback: 'https://images.unsplash.com/photo-1516683030153-9f8b8e8c482b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://www.worldwildlife.org/species/blue-whale'
+        },
+        {
+          title: 'African Elephant',
+          description: 'Recovering due to anti-poaching efforts, this iconic species is vital to African ecosystems.',
+          query: 'African elephant',
+          fallback: 'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://www.worldwildlife.org/species/african-elephant'
+        },
+        {
+          title: 'Monarch Butterfly',
+          description: 'Known for its epic migration, this butterfly benefits from conservation of its habitats.',
+          query: 'Monarch butterfly',
+          fallback: 'https://images.unsplash.com/photo-1516684669134-17df2ee6a1ca?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://www.nationalgeographic.com/animals/invertebrates/facts/monarch-butterfly'
+        },
+        {
+          title: 'Green Sea Turtle',
+          description: 'Protected globally, this turtle’s populations are recovering due to conservation efforts.',
+          query: 'Green sea turtle',
+          fallback: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://www.worldwildlife.org/species/green-turtle'
+        }
+      ],
+      news: [
+        {
+          title: 'Dire Wolf Resurrection',
+          description: 'Colossal Biosciences created three dire wolf puppies, prompting debates on the US Endangered Species List.',
+          query: 'Dire wolf',
+          fallback: 'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://people.com/dire-wolves-resurrected-trump-administration-says-endangered-species-list-go-extinct-8637918'
+        },
+        {
+          title: 'Siamese Crocodile Comeback',
+          description: '60 Siamese crocodile eggs hatched in Cambodia, marking the largest breeding event this century.',
+          query: 'Siamese crocodile',
+          fallback: 'https://images.unsplash.com/photo-1516683030153-9f8b8e8c482b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://www.cnn.com/2024/07/18/asia/cambodia-siamese-crocodile-eggs-hatch'
+        },
+        {
+          title: 'Australia’s Threatened Species',
+          description: '42 new flora and fauna species, including the King Island scrub complex, added to Australia’s threatened list.',
+          query: 'Australian wildlife',
+          fallback: 'https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://www.abc.net.au/news/2025-01-21/forty-one-species-added-australia-threatened-list/104159682'
+        },
+        {
+          title: 'Colombia’s Threatened Species Surge',
+          description: 'Colombia added hundreds of species to its threatened list, now totaling 2,103, with 93.8% of amphibians at risk.',
+          query: 'Colombian wildlife',
+          fallback: 'https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          link: 'https://news.mongabay.com/2024/02/colombia-adds-hundreds-of-species-to-list-of-threatened-flora-and-fauna/'
+        }
+      ]
+    };
+
+    async function renderArticle(data, section, index) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.dataset.section = section;
+      card.dataset.title = data.title.toLowerCase();
+      card.style.setProperty('--order', index);
+
+      const imgSrc = await fetchPexelsImage(data.query, data.fallback);
+      const description = data.description.length > 200 ? data.description.substring(0, 200) + '...' : data.description;
+
+      card.innerHTML = `
+        <a href="${data.link}" target="_blank" class="news-link"><img src="${imgSrc}" alt="${data.title}"></a>
+        <h2>${data.title}</h2>
+        <p>${description}</p>
+      `;
+
+      card.addEventListener('click', (e) => {
+        if (e.target.tagName !== 'IMG' && e.target.tagName !== 'A') {
+          showModal(data);
+        }
+      });
+      return card;
+    }
+
+    function showModal(data) {
+      modalMedia.innerHTML = `<img src="${imageCache.get(data.query) || data.fallback}" alt="${data.title}">`;
+      modalInfo.innerHTML = `
+        <h2>${data.title}</h2>
+        <p>${data.description}</p>
+        ${data.link ? `<p><a href="${data.link}" target="_blank" class="news-link">🔗 Read More</a></p>` : ''}
+      `;
+      modal.style.display = 'flex';
+    }
+
+    modalClose.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+
+    window.addEventListener('click', (e) => {
+      if (e.target === modal) modal.style.display = 'none';
+    });
+
+    async function loadArticles() {
+      articlesContainer.innerHTML = '';
+
+      for (const section of ['endangered', 'extinct', 'popular', 'news']) {
+        const sectionTitle = document.createElement('h2');
+        sectionTitle.className = 'section-title';
+        sectionTitle.id = section;
+        sectionTitle.textContent = section.charAt(0).toUpperCase() + section.slice(1) + (section === 'news' ? ' News' : ' Species');
+        articlesContainer.appendChild(sectionTitle);
+
+        const sectionContainer = document.createElement('div');
+        sectionContainer.className = 'articles';
+        sectionContainer.dataset.section = section;
+
+        let index = 0;
+        for (const data of speciesData[section]) {
+          const card = await renderArticle(data, section, index++);
+          sectionContainer.appendChild(card);
+        }
+
+        articlesContainer.appendChild(sectionContainer);
+      }
+    }
+
+    applySavedTheme();
+    loadArticles();
+  </script>
+</body>
+</html>

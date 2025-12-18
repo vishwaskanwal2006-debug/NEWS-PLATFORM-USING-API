@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AQI Insights</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #1e3a8a, #4c1d95);
+      color: #e2e8f0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      transition: all 0.3s ease;
+      overflow-y: auto;
+      margin: 0;
+    }
+    body.light-mode {
+      background: linear-gradient(135deg, #e0f2fe, #f9e8ff);
+      color: #2d3748;
+    }
+    .header {
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), transparent);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      padding: 1.5rem 0;
+    }
+    .light-mode .header {
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), transparent);
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 1rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: fadeInUp 0.5s ease forwards;
+      opacity: 0;
+      cursor: pointer;
+    }
+    .card:nth-child(1) { animation-delay: 0.1s; }
+    .card:nth-child(2) { animation-delay: 0.2s; }
+    .card:nth-child(3) { animation-delay: 0.3s; }
+    .card:nth-child(4) { animation-delay: 0.4s; }
+    .card:nth-child(5) { animation-delay: 0.5s; }
+    .card:nth-child(6) { animation-delay: 0.6s; }
+    .light-mode .card {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .card:hover {
+      transform: translateY(-5px) rotate(1deg);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+    .toggle-btn {
+      background: #4a5568;
+      color: #fff;
+      transition: background 0.3s ease, transform 0.2s;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .light-mode .toggle-btn {
+      background: #3182ce;
+    }
+    .toggle-btn:hover {
+      background: #718096;
+      transform: scale(1.1);
+    }
+    .light-mode .toggle-btn:hover {
+      background: #2b6cb0;
+    }
+    .section-title {
+      text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+      animation: slideInLeft 0.5s ease;
+    }
+    .light-mode .section-title {
+      text-shadow: none;
+    }
+    img {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      border-radius: 0.5rem;
+    }
+    img:hover {
+      opacity: 0.9;
+      transform: scale(1.05);
+    }
+    .parallax-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('https://images.pexels.com/photos/531756/pexels-photo-531756.jpeg') no-repeat center center;
+      background-size: cover;
+      z-index: -1;
+      transform: translateZ(-1px) scale(1.1);
+      opacity: 0.3;
+      transition: background-image 0.5s ease;
+    }
+    .news-link {
+      color: #60a5fa;
+      text-decoration: underline;
+      transition: color 0.3s ease;
+    }
+    .news-link:hover {
+      color: #2563eb;
+    }
+    .light-mode .news-link {
+      color: #1e40af;
+    }
+    .light-mode .news-link:hover {
+      color: #1e3a8a;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="parallax-bg"></div>
+  <header class="header text-center">
+    <button class="toggle-btn fixed top-4 left-4" onclick="toggleMode()">
+      <i class="fas fa-moon"></i>
+    </button>
+    <h1 class="text-4xl font-bold text-white light-mode:text-gray-800">AQI Insights</h1>
+    <p class="text-lg mt-2 text-gray-300 light-mode:text-gray-600">Explore Air Quality Index, Levels, and Recent News</p>
+  </header>
+
+  <nav class="flex justify-center gap-6 py-4 bg-gray-800 light-mode:bg-gray-100">
+    <a href="#measurement" class="text-blue-400 hover:text-blue-300 light-mode:text-blue-600 light-mode:hover:text-blue-800">How AQI is Measured</a>
+    <a href="#levels" class="text-blue-400 hover:text-blue-300 light-mode:text-blue-600 light-mode:hover:text-blue-800">AQI Levels</a>
+    <a href="#news" class="text-blue-400 hover:text-blue-300 light-mode:text-blue-600 light-mode:hover:text-blue-800">Recent News</a>
+  </nav>
+
+  <main class="container mx-auto px-4 py-8 relative z-10">
+    <section id="measurement" class="mb-12">
+      <h2 class="section-title text-3xl font-semibold mb-6 text-center">How AQI is Measured</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="card p-6">
+          <h3 class="text-xl font-bold mb-2">Pollutant Monitoring</h3>
+          <p>AQI tracks pollutants like PM2.5, PM10, CO, SO₂, NO₂, and ozone using air quality monitoring stations.</p>
+        </div>
+        <div class="card p-6">
+          <h3 class="text-xl font-bold mb-2">Data Collection</h3>
+          <p>Sensors measure pollutant concentrations in real-time, often hourly, at urban and rural sites.</p>
+        </div>
+        <div class="card p-6">
+          <h3 class="text-xl font-bold mb-2">AQI Calculation</h3>
+          <p>Each pollutant’s concentration is converted to a sub-index using EPA standards, with the highest sub-index becoming the AQI.</p>
+        </div>
+        <div class="card p-6">
+          <img id="measurement-img" src="https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Air quality sensor" class="w-full h-48 object-cover mb-4">
+          <p>Global standards, like those from the EPA, ensure consistent AQI reporting worldwide.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="levels" class="mb-12">
+      <h2 class="section-title text-3xl font-semibold mb-6 text-center">AQI Levels and Health Impacts</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="card p-6" data-aqi="good">
+          <img id="good-img" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Good AQI" class="w-full h-40 object-cover mb-4">
+          <h3 class="text-xl font-bold mb-2">Good (0-50)</h3>
+          <p>Air quality is satisfactory, posing little or no risk to health.</p>
+        </div>
+        <div class="card p-6" data-aqi="moderate">
+          <img id="moderate-img" src="https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Moderate AQI" class="w-full h-40 object-cover mb-4">
+          <h3 class="text-xl font-bold mb-2">Moderate (51-100)</h3>
+          <p>Acceptable air quality, but sensitive groups may experience minor effects.</p>
+        </div>
+        <div class="card p-6" data-aqi="unhealthy-sensitive">
+          <img id="unhealthy-sensitive-img" src="https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Unhealthy for Sensitive Groups AQI" class="w-full h-40 object-cover mb-4">
+          <h3 class="text-xl font-bold mb-2">Unhealthy for Sensitive Groups (101-150)</h3>
+          <p>Sensitive groups (e.g., elderly, children) may experience health effects.</p>
+        </div>
+        <div class="card p-6" data-aqi="unhealthy">
+          <img id="unhealthy-img" src="https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Unhealthy AQI" class="w-full h-40 object-cover mb-4">
+          <h3 class="text-xl font-bold mb-2">Unhealthy (151-200)</h3>
+          <p>Everyone may experience health effects; sensitive groups face more serious issues.</p>
+        </div>
+        <div class="card p-6" data-aqi="very-unhealthy">
+          <img id="very-unhealthy-img" src="https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Very Unhealthy AQI" class="w-full h-40 object-cover mb-4">
+          <h3 class="text-xl font-bold mb-2">Very Unhealthy (201-300)</h3>
+          <p>Health alert: everyone may experience serious health effects.</p>
+        </div>
+        <div class="card p-6" data-aqi="hazardous">
+          <img id="hazardous-img" src="https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Hazardous AQI" class="w-full h-40 object-cover mb-4">
+          <h3 class="text-xl font-bold mb-2">Hazardous (301-500)</h3>
+          <p>Emergency conditions: the entire population is likely to be affected.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="news" class="mb-12">
+      <h2 class="section-title text-3xl font-semibold mb-6 text-center">Recent Big AQI News</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="card p-6">
+          <img id="wildfire-img" src="https://images.unsplash.com/photo-1622286342621-1abc15728657?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Wildfire smoke" class="w-full h-48 object-cover mb-4">
+          <h3 class="text-xl font-bold mb-2">Canadian Wildfire Smoke</h3>
+          <p>Smoke from 2023 wildfires lingered into 2025, impacting air quality across North America. <a href="https://www.nytimes.com/2023/06/08/us/smoke-air-quality-wildfires.html" target="_blank" class="news-link">Read more</a></p>
+        </div>
+        <div class="card p-6">
+          <img id="delhi-img" src="https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Delhi smog" class="w-full h-48 object-cover mb-4">
+          <h3 class="text-xl font-bold mb-2">Delhi’s Winter Smog</h3>
+          <p>Delhi faced severe AQI levels in winter 2024-2025, prompting emergency measures. <a href="https://www.business-standard.com/india-news/delhi-air-quality-worsens-to-very-poor-as-thick-fog-reduces-visibility-125012900159_1.html" target="_blank" class="news-link">Read more</a></p>[](https://www.business-standard.com/india-news/delhi-air-quality-very-poor-aqi-dense-fog-low-visibility-pollution-weather-125012900145_1.html)
+        </div>
+        <div class="card p-6">
+          <img id="clean-air-img" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Clean air policy" class="w-full h-48 object-cover mb-4">
+          <h3 class="text-xl font-bold mb-2">Global Clean Air Policies</h3>
+          <p>New 2025 regulations aim to reduce PM2.5 emissions in major cities worldwide. <a href="https://www.unep.org/news-and-stories/story/new-global-air-quality-guidelines-aim-save-millions-lives" target="_blank" class="news-link">Read more</a></p>
+        </div>
+        <div class="card p-6">
+          <img id="chicago-img" src="https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Chicago AQI glitch" class="w-full h-48 object-cover mb-4">
+          <h3 class="text-xl font-bold mb-2">Chicago AQI Glitch</h3>
+          <p>Weather apps reported hazardous AQI in Chicago, later confirmed as a glitch. <a href="https://www.nytimes.com/2025/04/24/us/chicago-air-quality-weather-apps.html" target="_blank" class="news-link">Read more</a></p>[](https://www.nytimes.com/2025/04/23/weather/chicago-air-quality.html)
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="py-6 text-center bg-gray-800 light-mode:bg-gray-100 relative z-10">
+    <p class="text-gray-400 light-mode:text-gray-600">© 2025 AQI Insights. All rights reserved.</p>
+  </footer>
+
+  <script>
+    const aqiImageCache = new Map();
+
+    function toggleMode() {
+      const body = document.body;
+      const toggleIcon = document.querySelector('.toggle-btn i');
+      body.classList.toggle('light-mode');
+      toggleIcon.classList.toggle('fa-moon');
+      toggleIcon.classList.toggle('fa-sun');
+    }
+
+    async function fetchPexelsImage(query, fallbackUrl) {
+      if (aqiImageCache.has(query)) {
+        return aqiImageCache.get(query);
+      }
+
+      const pexelsApiKey = 'cE6sOe58z5nxcG7JZX0g9w4pTkex5snh4gapCej3UYJ4I0xemubOkl1M';
+      const pexelsApiUrl = `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=1`;
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        const response = await fetch(pexelsApiUrl, {
+          headers: { Authorization: pexelsApiKey },
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          if (response.status === 429) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            return fetchPexelsImage(query, fallbackUrl);
+          }
+          throw new Error(`Pexels API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const url = data.photos.length > 0 ? data.photos[0].src.large : fallbackUrl;
+        aqiImageCache.set(query, url);
+        return url;
+      } catch (err) {
+        console.error('Error fetching Pexels image:', err.message);
+        aqiImageCache.set(query, fallbackUrl);
+        return fallbackUrl;
+      }
+    }
+
+    async function loadImages() {
+      const images = [
+        { id: 'measurement-img', query: 'air quality sensor', fallback: 'https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+        { id: 'good-img', query: 'clean air', fallback: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+        { id: 'moderate-img', query: 'air quality', fallback: 'https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+        { id: 'unhealthy-sensitive-img', query: 'air pollution', fallback: 'https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+        { id: 'unhealthy-img', query: 'air pollution', fallback: 'https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+        { id: 'very-unhealthy-img', query: 'hazardous air', fallback: 'https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+        { id: 'hazardous-img', query: 'hazardous air', fallback: 'https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+        { id: 'wildfire-img', query: 'wildfire smoke', fallback: 'https://images.unsplash.com/photo-1622286342621-1abc15728657?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+        { id: 'delhi-img', query: 'smog', fallback: 'https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+        { id: 'clean-air-img', query: 'clean air', fallback: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+        { id: 'chicago-img', query: 'air pollution', fallback: 'https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' }
+      ];
+
+      for (const { id, query, fallback } of images) {
+        const imgElement = document.getElementById(id);
+        if (imgElement) {
+          const src = await fetchPexelsImage(query, fallback);
+          imgElement.src = src;
+        }
+      }
+    }
+
+    async function updateBackground(aqiLevel) {
+      const aqiQueries = {
+        good: { query: 'clean air', fallback: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+        moderate: { query: 'air quality', fallback: 'https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+        'unhealthy-sensitive': { query: 'air pollution', fallback: 'https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+        unhealthy: { query: 'air pollution', fallback: 'https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+        'very-unhealthy': { query: 'hazardous air', fallback: 'https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+        hazardous: { query: 'hazardous air', fallback: 'https://images.unsplash.com/photo-1517502596876-5b44d7c33359?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' }
+      };
+
+      const { query, fallback } = aqiQueries[aqiLevel] || aqiQueries.good;
+      const imageUrl = await fetchPexelsImage(query, fallback);
+      document.querySelector('.parallax-bg').style.backgroundImage = `url('${imageUrl}')`;
+    }
+
+    function setupAqiCardListeners() {
+      const aqiCards = document.querySelectorAll('#levels .card');
+      aqiCards.forEach(card => {
+        card.addEventListener('click', () => {
+          const aqiLevel = card.dataset.aqi;
+          if (aqiLevel) {
+            updateBackground(aqiLevel);
+          }
+        });
+        card.addEventListener('mouseenter', () => {
+          const aqiLevel = card.dataset.aqi;
+          if (aqiLevel) {
+            updateBackground(aqiLevel);
+          }
+        });
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadImages();
+      setupAqiCardListeners();
+      updateBackground('good'); // Default background
+    });
+  </script>
+</body>
+</html>

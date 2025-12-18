@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NASA Space News</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap">
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      --text-color: #fff;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --header-bg: rgba(0, 0, 0, 0.7);
+      --footer-bg: rgba(0, 0, 0, 0.6);
+      --modal-text-color: #fff;
+    }
+
+    body.light-mode {
+      --bg-gradient: linear-gradient(to right, #f0f0f0, #ffffff, #e0e0e0);
+      --text-color: #111;
+      --card-bg: rgba(0, 0, 0, 0.05);
+      --header-bg: rgba(255, 255, 255, 0.7);
+      --footer-bg: rgba(255, 255, 255, 0.6);
+      --modal-text-color: #000;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-color);
+      transition: background 0.5s, color 0.5s;
+    }
+
+    header {
+      padding: 1rem;
+      background: var(--header-bg);
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+
+    #toggle-theme {
+      position: absolute;
+      right: 1rem;
+      top: 1rem;
+      background: transparent;
+      border: 2px solid var(--text-color);
+      color: var(--text-color);
+      padding: 0.3rem 0.6rem;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    #toggle-theme:hover {
+      background: var(--text-color);
+      color: var(--bg-gradient);
+    }
+
+    #search-container {
+      margin: 1rem auto;
+      text-align: center;
+    }
+
+    #search {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      border: none;
+      width: 250px;
+      font-size: 1rem;
+    }
+
+    .articles {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 15px;
+      margin: 1rem;
+      width: 300px;
+      padding: 1rem;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+      transition: transform 0.3s;
+      animation: fadeIn 0.6s ease-in-out;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: scale(1.03);
+    }
+
+    .card img,
+    .card iframe {
+      max-width: 100%;
+      border-radius: 10px;
+    }
+
+    .card h2 {
+      font-size: 1.2rem;
+      margin-top: 0.5rem;
+    }
+
+    .card p {
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.9rem;
+      background: var(--footer-bg);
+      margin-top: 2rem;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      display: flex;
+      flex-wrap: wrap;
+      background: var(--card-bg);
+      color: var(--modal-text-color);
+      width: 90%;
+      max-width: 900px;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 0 10px #000;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .modal-left, .modal-right {
+      flex: 1;
+      padding: 1rem;
+    }
+
+    .modal-left img,
+    .modal-left iframe {
+      width: 100%;
+      border-radius: 10px;
+    }
+
+    .modal-right h2 {
+      margin-top: 0;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 2rem;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    @media (max-width: 700px) {
+      .modal-content {
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .card, #search {
+        width: 90%;
+      }
+      #toggle-theme {
+        top: 0.5rem;
+        right: 0.5rem;
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🚀 NASA Space News</h1>
+    <button id="toggle-theme" aria-label="Toggle theme" title="Toggle light/dark mode">🌙</button>
+  </header>
+
+  <div id="search-container">
+    <input type="date" id="search" placeholder="Search by date (YYYY-MM-DD)">
+  </div>
+
+  <section class="articles" id="articles">
+    <p style="text-align: center;">Loading...</p>
+  </section>
+
+  <footer>
+    <p>Powered by NASA Open APIs | Astronomy Picture of the Day</p>
+  </footer>
+
+  <!-- Modal -->
+  <div class="modal" id="modal">
+    <div class="modal-close" id="modal-close">&times;</div>
+    <div class="modal-content" id="modal-content">
+      <div class="modal-left" id="modal-media"></div>
+      <div class="modal-right" id="modal-info"></div>
+    </div>
+  </div>
+
+  <script>
+    const apiKey = "Spn2aIgEEAIW68JiUG67obNcwEHniaQ9cpRQipOK";
+    const articlesContainer = document.getElementById("articles");
+    const searchInput = document.getElementById("search");
+    const toggleBtn = document.getElementById("toggle-theme");
+
+    const modal = document.getElementById("modal");
+    const modalClose = document.getElementById("modal-close");
+    const modalMedia = document.getElementById("modal-media");
+    const modalInfo = document.getElementById("modal-info");
+
+    function setTheme(mode) {
+      const isLight = mode === "light";
+      document.body.classList.toggle("light-mode", isLight);
+      toggleBtn.textContent = isLight ? "🌙" : "☀️";
+      localStorage.setItem("theme", mode);
+    }
+
+    toggleBtn.addEventListener("click", () => {
+      const isCurrentlyLight = document.body.classList.contains("light-mode");
+      setTheme(isCurrentlyLight ? "dark" : "light");
+    });
+
+    function applySavedTheme() {
+      const saved = localStorage.getItem("theme") || "dark";
+      setTheme(saved);
+    }
+
+    async function fetchAPOD(date = "") {
+      const url = `https://api.nasa.gov/planetary/apod?api_key=${apiKey}${date ? `&date=${date}` : ""}`;
+      try {
+        const res = await fetch(url);
+        return await res.json();
+      } catch (error) {
+        console.error("API error:", error);
+        return null;
+      }
+    }
+
+    function renderArticle(data) {
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const mediaHTML =
+        data.media_type === "image"
+          ? `<img src="${data.url}" alt="${data.title}">`
+          : `<iframe src="${data.url}" frameborder="0" allowfullscreen></iframe>`;
+
+      card.innerHTML = `
+        ${mediaHTML}
+        <h2>${data.title}</h2>
+        <p><strong>${data.date}</strong></p>
+        <p>${data.explanation ? data.explanation.substring(0, 200) + "..." : "No explanation available."}</p>
+      `;
+
+      card.addEventListener("click", () => showModal(data));
+      articlesContainer.appendChild(card);
+    }
+
+    function showModal(data) {
+      modalMedia.innerHTML =
+        data.media_type === "image"
+          ? `<img src="${data.url}" alt="${data.title}">`
+          : `<iframe src="${data.url}" frameborder="0" allowfullscreen></iframe>`;
+
+      modalInfo.innerHTML = `
+        <h2>${data.title}</h2>
+        <p><strong>Date:</strong> ${data.date}</p>
+        <p>${data.explanation ? data.explanation.substring(0, 400) + "..." : "No explanation available."}</p>
+        <p><a href="https://apod.nasa.gov/apod/ap${data.date.replaceAll("-", "").substring(2)}.html" target="_blank" style="color: lightblue;">🔗 Read More on NASA APOD</a></p>
+      `;
+
+      modal.style.display = "flex";
+    }
+
+    modalClose.addEventListener("click", () => {
+      modal.style.display = "none";
+    });
+
+    window.addEventListener("click", (e) => {
+      if (e.target === modal) modal.style.display = "none";
+    });
+
+    async function loadInitialArticles() {
+      articlesContainer.innerHTML = "";
+      const today = new Date();
+      for (let i = 0; i < 5; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+        const formatted = date.toISOString().split("T")[0];
+        const data = await fetchAPOD(formatted);
+        if (data) renderArticle(data);
+      }
+    }
+
+    searchInput.addEventListener("change", async () => {
+      articlesContainer.innerHTML = "<p style='text-align:center;'>Loading...</p>";
+      const data = await fetchAPOD(searchInput.value);
+      articlesContainer.innerHTML = "";
+      if (data) renderArticle(data);
+    });
+
+    applySavedTheme();
+    loadInitialArticles();
+  </script>
+</body>
+</html>

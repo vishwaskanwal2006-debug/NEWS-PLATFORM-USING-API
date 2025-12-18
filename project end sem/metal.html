@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Metal Prices Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <meta http-equiv="refresh" content="86400">
+  <style>
+    body {
+      background-color: #000;
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+      margin: 0;
+    }
+
+    .card {
+      background-color: #111;
+      border: 1px solid #333;
+      border-radius: 1rem;
+      padding: 2rem;
+      transition: transform 0.2s ease;
+      min-width: 250px;
+      flex-shrink: 0;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: #555;
+    }
+
+    .title-text {
+      color: white;
+      font-weight: 600;
+    }
+
+    .value {
+      font-size: 1.25rem;
+      margin-top: 0.5rem;
+    }
+
+    .change {
+      font-size: 0.9rem;
+    }
+
+    .change-up { color: #00ff00; } /* green */
+    .change-down { color: #ff4d4d; } /* red */
+    .change-stable { color: #ffffff; } /* white */
+
+    .ticker {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: #111;
+      color: white;
+      padding: 10px 0;
+      text-align: center;
+      font-size: 1rem;
+      border-bottom: 1px solid #333;
+      z-index: 50;
+    }
+
+    .scroll-wrapper {
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .scroll-container {
+      display: flex;
+      gap: 1.5rem;
+      padding-bottom: 1rem;
+      width: max-content;
+      animation: scrollLoop 60s linear infinite;
+    }
+
+    @keyframes scrollLoop {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .gold-card h2, .gold-card .value { color: gold; }
+    .silver-card h2, .silver-card .value { color: silver; }
+    .diamond-card h2, .diamond-card .value { color: #b9f2ff; }
+    .platinum-card h2, .platinum-card .value { color: #e5e4e2; }
+    .copper-card h2, .copper-card .value { color: #b87333; }
+  </style>
+</head>
+<body>
+
+  <!-- Ticker -->
+  <div class="ticker">
+    Gold: $2,300 / ounce | Silver: $27.50 / ounce | Diamond: $5,000 / carat | Platinum: $980 / ounce | Copper: $4.25 / pound
+  </div>
+
+  <main class="flex flex-col items-center justify-center min-h-screen pt-24 px-4">
+    <h1 class="text-4xl font-bold text-center title-text mb-12">Metal Market Dashboard</h1>
+    <div class="scroll-wrapper max-w-6xl mx-auto px-4">
+      <div class="scroll-container">
+
+        <!-- Looping Cards -->
+        <div class="flex">
+          <!-- Group of Cards -->
+          <div class="flex">
+            <div class="card text-center gold-card">
+              <h2 class="text-2xl font-semibold">Gold</h2>
+              <p class="value">$2,300 / ounce</p>
+              <p class="change change-up">↑ Up 5% this month</p>
+            </div>
+            <div class="card text-center silver-card">
+              <h2 class="text-2xl font-semibold">Silver</h2>
+              <p class="value">$27.50 / ounce</p>
+              <p class="change change-down">↓ Down 2% this month</p>
+            </div>
+            <div class="card text-center diamond-card">
+              <h2 class="text-2xl font-semibold">Diamond</h2>
+              <p class="value">$5,000 / carat</p>
+              <p class="change change-stable">→ Stable this month</p>
+            </div>
+            <div class="card text-center platinum-card">
+              <h2 class="text-2xl font-semibold">Platinum</h2>
+              <p class="value">$980 / ounce</p>
+              <p class="change change-up">↑ Up 1.5% this month</p>
+            </div>
+            <div class="card text-center copper-card">
+              <h2 class="text-2xl font-semibold">Copper</h2>
+              <p class="value">$4.25 / pound</p>
+              <p class="change change-up">↑ Up 0.8% this month</p>
+            </div>
+          </div>
+          <!-- Duplicate group for seamless loop -->
+          <div class="flex">
+            <div class="card text-center gold-card">
+              <h2 class="text-2xl font-semibold">Gold</h2>
+              <p class="value">$2,300 / ounce</p>
+              <p class="change change-up">↑ Up 5% this month</p>
+            </div>
+            <div class="card text-center silver-card">
+              <h2 class="text-2xl font-semibold">Silver</h2>
+              <p class="value">$27.50 / ounce</p>
+              <p class="change change-down">↓ Down 2% this month</p>
+            </div>
+            <div class="card text-center diamond-card">
+              <h2 class="text-2xl font-semibold">Diamond</h2>
+              <p class="value">$5,000 / carat</p>
+              <p class="change change-stable">→ Stable this month</p>
+            </div>
+            <div class="card text-center platinum-card">
+              <h2 class="text-2xl font-semibold">Platinum</h2>
+              <p class="value">$980 / ounce</p>
+              <p class="change change-up">↑ Up 1.5% this month</p>
+            </div>
+            <div class="card text-center copper-card">
+              <h2 class="text-2xl font-semibold">Copper</h2>
+              <p class="value">$4.25 / pound</p>
+              <p class="change change-up">↑ Up 0.8% this month</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+</body>
+</html>
